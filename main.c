@@ -16,11 +16,34 @@ bool *bool_tab_init(int size) {
   return bool_tab;
 }
 
+void bool_tab_pressed_fill(bool_8 *bool_tab_pressed, bool *bool_tab, int size) {
+    for (int i = 0; i < size; i++) {
+        int byte_index = i / 8;
+        int bit_index = i % 8;
+        if (bool_tab[i]) {
+            bool_tab_pressed[byte_index] |= (1 << bit_index);
+        } else {
+            bool_tab_pressed[byte_index] &= ~(1 << bit_index);
+        }
+    }
+}
+
 bool_8 *bool_tab_pressed_init(bool *bool_tab, int size, int *pressed_size) {
   bool_8 *bool_tab_pressed;
   *pressed_size = (sizeof(bool) * 2 * size + 7) / 8;
   bool_tab_pressed = malloc(sizeof(bool_8) * *pressed_size);
+
+  bool_tab_pressed_fill(bool_tab_pressed, bool_tab, size);
+
   return bool_tab_pressed;
+}
+
+void bool_tab_pressed_print(bool_8 *bool_tab_pressed, int size) {
+  for (int i = 0; i < size; i++) {
+    for (int j = 0; j < 8; j++) {
+      printf("%d ", (bool_tab_pressed[i] >> j) & 1);
+    }
+  }
 }
 
 void print_err(char *str) { fprintf(stderr, str, strlen(str)); }
@@ -53,6 +76,8 @@ int main(int argc, char **argv) {
   }
   printf("The bool_8 array is %d bytes or %d bit.\n", pressed_size,
          pressed_size * 8);
+
+  bool_tab_pressed_print(bool_tab_pressed, size);
 
   free(bool_tab);
   free(bool_tab_pressed);
