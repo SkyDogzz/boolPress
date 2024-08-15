@@ -39,10 +39,11 @@ bool_8 *bool_tab_pressed_init(bool *bool_tab, int size, int *pressed_size) {
 }
 
 void bool_tab_pressed_print(bool_8 *bool_tab_pressed, int size) {
+  int num_elements = size / 8;
   for (int i = 0; i < size; i++) {
-    for (int j = 0; j < 8; j++) {
-      printf("%d ", (bool_tab_pressed[i] >> j) & 1);
-    }
+    int byte_index = i / 8;
+    int bit_index = i % 8;
+    printf("%d ", (bool_tab_pressed[byte_index] >> bit_index) & 1);
   }
 }
 
