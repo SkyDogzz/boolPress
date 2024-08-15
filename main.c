@@ -9,7 +9,6 @@
 
 bool *bool_tab_init(int size) {
   bool *bool_tab = malloc(sizeof(bool) * size);
-  srand(time(NULL));
   for (int i = 0; i < size; i++) {
     bool_tab[i] = rand() % 2;
   }
@@ -17,15 +16,15 @@ bool *bool_tab_init(int size) {
 }
 
 void bool_tab_pressed_fill(bool_8 *bool_tab_pressed, bool *bool_tab, int size) {
-    for (int i = 0; i < size; i++) {
-        int byte_index = i / 8;
-        int bit_index = i % 8;
-        if (bool_tab[i]) {
-            bool_tab_pressed[byte_index] |= (1 << bit_index);
-        } else {
-            bool_tab_pressed[byte_index] &= ~(1 << bit_index);
-        }
+  for (int i = 0; i < size; i++) {
+    int byte_index = i / 8;
+    int bit_index = i % 8;
+    if (bool_tab[i]) {
+      bool_tab_pressed[byte_index] |= (1 << bit_index);
+    } else {
+      bool_tab_pressed[byte_index] &= ~(1 << bit_index);
     }
+  }
 }
 
 bool_8 *bool_tab_pressed_init(bool *bool_tab, int size, int *pressed_size) {
@@ -39,7 +38,6 @@ bool_8 *bool_tab_pressed_init(bool *bool_tab, int size, int *pressed_size) {
 }
 
 void bool_tab_pressed_print(bool_8 *bool_tab_pressed, int size) {
-  int num_elements = size / 8;
   for (int i = 0; i < size; i++) {
     int byte_index = i / 8;
     int bit_index = i % 8;
@@ -48,6 +46,19 @@ void bool_tab_pressed_print(bool_8 *bool_tab_pressed, int size) {
 }
 
 void print_err(char *str) { fprintf(stderr, str, strlen(str)); }
+
+void bool_tab_pressed_swap(bool_8 *bool_tab_pressed, int index) {
+  bool_tab_pressed[index / 8] ^= (1 << index % 8);
+}
+
+void bool_tab_pressed_set(bool_8 *bool_tab_pressed, int index, bool state) {
+  int byte_index = index / 8;
+  int bit_index = index % 8;
+  if (state)
+    bool_tab_pressed[byte_index] |= (1 << bit_index);
+  else
+    bool_tab_pressed[byte_index] &= ~(1 << bit_index);
+}
 
 int main(int argc, char **argv) {
   int size = BOOL_TAB_SIZE;
@@ -69,6 +80,7 @@ int main(int argc, char **argv) {
          (int)sizeof(bool) * 16 * size);
 
   int pressed_size = 0;
+  srand(time(NULL));
   bool_8 *bool_tab_pressed =
       bool_tab_pressed_init(bool_tab, size, &pressed_size);
   if (!bool_tab_pressed) {
@@ -78,6 +90,16 @@ int main(int argc, char **argv) {
   printf("The bool_8 array is %d bytes or %d bit.\n", pressed_size,
          pressed_size * 8);
 
+  bool_tab_pressed_print(bool_tab_pressed, size);
+  for (int i = 0; i < size; i++) {
+    bool_tab_pressed_swap(bool_tab_pressed, i);
+  }
+  printf("\n");
+  bool_tab_pressed_print(bool_tab_pressed, size);
+  for (int i = 0; i < size; i++) {
+    bool_tab_pressed_set(bool_tab_pressed, i, rand() % 2);
+  }
+  printf("\n");
   bool_tab_pressed_print(bool_tab_pressed, size);
 
   free(bool_tab);
